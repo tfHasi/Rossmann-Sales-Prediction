@@ -53,7 +53,7 @@ with col1:
 
 # Right column inputs
 with col2:
-    promo = st.selectbox("Are there any Promotion running?", [0, 1], 
+    promo = st.selectbox("Is there any Promotion running?", [0, 1], 
                         format_func=lambda x: "Yes" if x == 1 else "No")
     state_holiday = st.selectbox("Type ofState Holiday", ["0", "a", "b", "c"], 
                                format_func=lambda x: "None" if x == "0" else f"Holiday {x.upper()}")
