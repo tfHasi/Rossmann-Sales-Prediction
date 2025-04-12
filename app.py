@@ -46,17 +46,18 @@ with col1:
     date_input = st.date_input("Date", datetime.date(2015, 1, 1), 
                               min_value=datetime.date(2015, 1, 1), 
                               max_value=datetime.date(2016, 12, 31))
-    day_of_week = st.number_input("Day of Week", 1, 7, value=3)
-    open_input = st.selectbox("Store open?", [1, 0], 
+    # Calculate day of week automatically from date
+    day_of_week = pd.to_datetime(date_input).dayofweek + 1  # +1 because pandas uses 0-6 and we want 1-7
+    open_input = st.selectbox("Is the Store open?", [1, 0], 
                              format_func=lambda x: "Yes" if x == 1 else "No")
 
 # Right column inputs
 with col2:
-    promo = st.selectbox("Promo running?", [0, 1], 
+    promo = st.selectbox("Are there any Promotion running?", [0, 1], 
                         format_func=lambda x: "Yes" if x == 1 else "No")
-    state_holiday = st.selectbox("State Holiday", ["0", "a", "b", "c"], 
+    state_holiday = st.selectbox("Type ofState Holiday", ["0", "a", "b", "c"], 
                                format_func=lambda x: "None" if x == "0" else f"Holiday {x.upper()}")
-    school_holiday = st.selectbox("School Holiday?", [0, 1], 
+    school_holiday = st.selectbox("Is it a School Holiday?", [0, 1], 
                                 format_func=lambda x: "Yes" if x == 1 else "No")
     # Empty space to align with left column
     st.write("")
@@ -69,9 +70,12 @@ predict_btn = st.button("Predict Sales", type="primary", use_container_width=Tru
 if predict_btn:
     # Create a spinner for processing feedback
     with st.spinner("Calculating forecast..."):
+        # Initialize pred_sales first to avoid NameError
+        pred_sales = 0
+        
         # Quick exit for closed stores
         if open_input == 0:
-            st.success("Predicted Sales: 0.00")
+            pred_sales = 0
         else:
             # Process input data
             input_data = {
@@ -120,7 +124,7 @@ if predict_btn:
     
     # Display result in a more prominent way
     st.divider()
-    st.metric(label="Predicted Daily Sales", value=f"€{pred_sales:,.2f}")
+    st.metric(label=f"Predicted Sales for {date_input}", value=f"€{pred_sales:,.2f}")
     
     # Display store info in two columns
     st.subheader("Store Information")
